@@ -1,8 +1,8 @@
-# <3IGEN
+# 3IGEN
 
 This repository contains a rough implementation of a standard finite element program (aimed basic linear 3D elasticity problems) utilising [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page), a (header only) C++ template library for linear algebra. (The most recent implementation of the program, captured here, is tested with 3.4.0.) See the Wiki [page](https://en.wikipedia.org/wiki/Eigen_(C%2B%2B_library)) of Eigen, with links to explanations of expression template metaprogramming techniques, expression trees, loop unrolling and vectorization, _etc_..
 
-An example _Makefile_ is included, with the authors' specific paths _etc_. hard-coded. Compilation with header only libraries is of course, in general, relatively easy (compared to _e.g._ PETSc). Currently the program also relies on a header only JSON input reader, provided [here](https://json.nlohmann.me/integration/) (the single _hpp_ file provided). A typical complication command on a Linux system may take the following form
+An example _Makefile_ is included, with the authors' specific paths _etc_. hard-coded. Compilation with header only libraries is of course, in general, relatively easy (compared to _e.g._ PETSc). Currently the program also relies on a header only JSON input reader, provided [here](https://json.nlohmann.me/integration/) (the single _hpp_ file provided). A typical compilation command on a Linux system may take the following form
 
 > `g++ -fopenmp -O2 -I PATH_TO_EIGEN_DIRECTORY -I PATH_TO_JSON_READER_DIRECTORY main.cpp read_json.cpp wrte_lvtk.cpp dmat.cpp smat.cpp scg.cpp  -o main`
 
