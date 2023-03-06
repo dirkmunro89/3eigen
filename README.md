@@ -54,7 +54,8 @@ The table below contains time required to solve a linear system which arises fro
 
 - Small scale examples have been verified against CalculiX&mdash;see _vav_.
 
-- A simple topology optization code, in this frame, is in work.
+- A simple topology optimization code, in this frame, is in work. See subdirectory _topopt_. The optimizatin loop is a sequentical convex programming methodology (as is standard in structural optimization), with a simple dual (of Falk) subsolver built on top of a header-only implementation of [LBFGSB](https://lbfgspp.statr.me/). (This type of implementation should be perfectly fine for problems with a small number of constraints.) Currently curvature terms are hard-coded for the minimum compliance problem. Density filtering is done only with respect to nearsest neighbours, and implemented based on element-node connectivities. Padding-like modification may be needed, amongst many many other things&mdash;it is only a rough, first implementation, for testing.
+
 
 <div align="center">
 <img src="topopt.png" alt="TopOpt"/>
