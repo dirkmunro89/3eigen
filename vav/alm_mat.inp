@@ -1,0 +1,4 @@
+*Material, name=mat-alm
+*Elastic
+1.000000e+00, 0.300000
+*Solid Section, elset=set-ref, material=mat-alm

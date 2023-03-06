@@ -1,0 +1,13 @@
+*Step,nlgeom=no
+*Static, solver=iterative scaling
+1.,1.,1.,1.
+*Cload
+61,2,1.
+62,2,1.
+63,2,1.
+64,2,1.
+*Node file,frequency=1000
+U
+*EL file,frequency=1000
+
+*End Step

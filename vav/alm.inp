@@ -1,0 +1,10 @@
+***
+*Heading
+***
+*Include, input=alm_nds.inp
+*Include, input=alm_els.inp
+*Include, input=alm_sts.inp
+*Include, input=alm_bcs.inp
+*Include, input=alm_mat.inp
+*Include, input=alm_stp.inp
+***
