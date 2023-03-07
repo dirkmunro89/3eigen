@@ -57,7 +57,7 @@ The table below contains time required to solve a linear system which arises fro
 - A simple topology optimization code, in this frame, is in work. See subdirectory _topopt_. The optimizatin loop is a sequentical convex programming methodology (as is standard in structural optimization), with a simple dual (of Falk) subsolver built on top of a header-only implementation of [LBFGSB](https://lbfgspp.statr.me/). (This type of implementation should be perfectly fine for problems with a small number of constraints.) Currently curvature terms are hard-coded for the minimum compliance problem. Density filtering is done only with respect to nearsest neighbours, and implemented based on element-node connectivities. Padding-like modification may be needed, amongst many many other things&mdash;it is only a rough, first implementation, for testing.
 
 <figure>
-![](https://github.com/dirkmunro89/3igen/topopt/ani/design.gif)
+![](https://github.com/dirkmunro89/3igen/tree/main/topopt/ani/design.gif)
 <figcaption align = "center"> Stiffness design for twisting (50 &times; 50 &times; 50); interpolated (to nodes) and clipped design variable field</figcaption>
 </figure>
 
