@@ -12,7 +12,7 @@ The code is then executed with, for example
 
 wherein _1_ is a flag which indicates what linear solver will be used (details below), and _16_ indicates the number of sharded memory (openmp) threads. Eigen automatically uses multi-threading for some [operations](https://eigen.tuxfamily.org/dox/TopicMultiThreading.html). Some initial timing tests are given below.
 
- A JSON input deck containing node, element, material, loads and boundary condition specification (see _make_test.py_ for creation of a basic grid in a programmatic manner). The format is taken from an example code of [Aragon](https://www.tudelft.nl/staff/a.m.aragon/?cHash=23ad70006635654bbc79d16b98d92f29), as communicted in his course on Advanced Finite Element Methods (TU Delft, 2023). It should be noted that the fact that the example mesh (generation) is a 'structured grid' is not exploited anywhere in the program (for we wish to implement unstructured tetrahedrons as well).
+A JSON input deck is used, containing node, element, material, loads and boundary condition specification (see _make_test.py_ for creation of a basic grid in a programmatic manner). The format is taken from an example code of [Aragon](https://www.tudelft.nl/staff/a.m.aragon/?cHash=23ad70006635654bbc79d16b98d92f29), as communicted in his course on Advanced Finite Element Methods (TU Delft, 2023). It should be noted that the fact that the example mesh (generation) is a 'structured grid' is not exploited anywhere in the program (for we wish to implement unstructured tetrahedrons as well).
 
 The sparse global stiffness matrix is constructed from a list of triplets, as created during the assembly loop. Element-level dense matrix operations (to arrive at an individual elements stiffness matrix) is done with (seemingly efficient) Eigen matrix-matrix operations
 
@@ -52,9 +52,9 @@ The table below contains time required to solve a linear system which arises fro
 
 </div>
 
-- Small scale examples have been verified against CalculiX&mdash;see _vav_.
+Small scale examples have been verified against CalculiX&mdash;see _vav_.
 
-- A simple topology optimization code, in this frame, is in work. See subdirectory _topopt_. The optimizatin loop is a sequentical convex programming methodology (as is standard in structural optimization), with a simple dual (of Falk) subsolver built on top of a header-only implementation of [LBFGSB](https://lbfgspp.statr.me/). (This type of implementation should be perfectly fine for problems with a small number of constraints.) Currently curvature terms are hard-coded for the minimum compliance problem. Density filtering is done only with respect to nearsest neighbours, and implemented based on element-node connectivities. Padding-like modification may be needed, amongst many many other things&mdash;it is only a rough, first implementation, for testing.
+A simple topology optimization code, in this frame, is in work. See subdirectory _topopt_. The optimizatin loop is a sequentical convex programming methodology (as is standard in structural optimization), with a simple dual (of Falk) subsolver built on top of a header-only implementation of [LBFGSB](https://lbfgspp.statr.me/). (This type of implementation should be perfectly fine for problems with a small number of constraints.) Currently curvature terms are hard-coded for the minimum compliance problem. Density filtering is done only with respect to nearsest neighbours, and implemented based on element-node connectivities. Padding-like modification may be needed, amongst many many other things&mdash;it is only a rough, first implementation, for testing.
 
 <figure>
 <figcaption align = "center"> Stiffness design for twisting-like load (small-scale 50 &times; 50 &times; 50); interpolated (to nodes) and clipped design variable field</figcaption>
