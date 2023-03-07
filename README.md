@@ -59,6 +59,7 @@ The table below contains time required to solve a linear system which arises fro
 <figure>
 <figcaption align = "center"> Stiffness design for twisting-like load (small-scale 50 &times; 50 &times; 50); interpolated (to nodes) and clipped design variable field</figcaption>
 </figure>
+
 ![gif](topopt/ani/design.gif)
 
 <figure>
