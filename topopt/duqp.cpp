@@ -50,7 +50,7 @@ public:
     }
 };
 
-int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_l, VectorXd& dx_u, VectorXi& c_s, VectorXd& x)
+int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_l, VectorXd& dx_u, VectorXi& c_s, VectorXd& x_d, VectorXd& x)
 {
     // Set up parameters
     LBFGSBParam<double> param;  // New parameter class
@@ -88,7 +88,7 @@ int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_
     }
 //
     double fx;
-    VectorXd x_d = VectorXd::Ones(c_s.size())*0e0;
+//    VectorXd x_d = VectorXd::Ones(c_s.size())*0e0;
     int niter = solver.minimize(fun, x_d, fx, lb, ub);
 //
     std::cout << niter << " iterations" << std::endl;

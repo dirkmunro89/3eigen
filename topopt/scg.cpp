@@ -195,6 +195,7 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
     if(iam>0){
         qam=qam/iam;
     }
+    qam=qam*1e-2;
 //
     auto t1 = high_resolution_clock::now();
     c= 0;

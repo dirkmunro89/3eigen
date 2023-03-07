@@ -41,11 +41,12 @@ int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H)
             for (auto it = q.begin(); it!=q.end();it++) // loop over neighbours
             {
                 if (*it != -1){
-                    coefs.push_back(T(e, *it, 1./(q.size()))); //removing -1 and adding factor 
+                    coefs.push_back(T(e, *it, 1./(27.))); //removing -1 and adding factor 
+//                  coefs.push_back(T(e, *it, 1./(q.size()))); //removing -1 and adding factor 
                                                                //2 for current element cancels here
                 }
             }
-            coefs.push_back(T(e, e, 1./q.size()));
+            coefs.push_back(T(e, e, 1./27.));
         }
     }
 //
