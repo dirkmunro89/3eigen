@@ -56,23 +56,23 @@ The table below contains time required to solve a linear system which arises fro
 
 - A simple topology optimization code, in this frame, is in work. See subdirectory _topopt_. The optimizatin loop is a sequentical convex programming methodology (as is standard in structural optimization), with a simple dual (of Falk) subsolver built on top of a header-only implementation of [LBFGSB](https://lbfgspp.statr.me/). (This type of implementation should be perfectly fine for problems with a small number of constraints.) Currently curvature terms are hard-coded for the minimum compliance problem. Density filtering is done only with respect to nearsest neighbours, and implemented based on element-node connectivities. Padding-like modification may be needed, amongst many many other things&mdash;it is only a rough, first implementation, for testing.
 
+<figure>
+<figcaption align = "center"> Stiffness design for twisting-like load (small-scale 50 &times; 50 &times; 50); interpolated (to nodes) and clipped design variable field</figcaption>
+</figure>
 ![gif](topopt/ani/design.gif)
-<figure>
-<figcaption align = "center"> Stiffness design for twisting (50 &times; 50 &times; 50); interpolated (to nodes) and clipped design variable field</figcaption>
-</figure>
 
 <figure>
+<figcaption align = "center"> Stiffness design for cantilever-like load; interpolated (to nodes) and clipped design variable field (150 &times; 150 &times; 150)</figcaption>
 <img src="topopt2.png" alt="TopOpt2"/>
-<figcaption align = "center"> Stiffness design for bending; interpolated (to nodes) and clipped design variable field (150 &times; 150 &times; 150)</figcaption>
 </figure>
 
 
 <figure>
-<img src="zoom.png" alt="TopOpt2"/>
 <figcaption align = "center"> Zoom on interpolated (to nodes) and clipped design variable field (150 &times; 150 &times; 150)</figcaption>
+<img src="zoom.png" alt="TopOpt2"/>
 </figure>
 
 <figure>
-<img src="dome.png" alt="TopOpt2"/>
 <figcaption align = "center"> Dome-like; approaching thin walled, not yet converged (150 &times; 150 &times; 150)</figcaption>
+<img src="dome.png" alt="TopOpt2"/>
 </figure>
