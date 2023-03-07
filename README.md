@@ -60,7 +60,7 @@ A simple topology optimization code, in this frame, is in work. See subdirectory
 <figcaption align = "center"> Stiffness design for twisting-like load (small-scale 50 &times; 50 &times; 50); interpolated (to nodes) and clipped design variable field</figcaption>
 </figure>
 
-![gif](topopt/ani/design.gif)
+![gif](topopt/ani/design2.gif)
 
 <figure>
 <figcaption align = "center"> Stiffness design for cantilever-like load; interpolated (to nodes) and clipped design variable field (150 &times; 150 &times; 150)</figcaption>
