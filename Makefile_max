@@ -1,0 +1,25 @@
+EIGEN_URL=https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+JSON_URL=https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
+
+CFLAGS=-std=c++11 -fopenmp -O3
+
+main: third_party/eigen-3.4.0 third_party/json *.cpp
+	g++ ${CFLAGS} -I third_party/eigen-3.4.0 -I third_party/json/single_include/nlohmann main.cpp read_json.cpp wrte_lvtk.cpp dmat.cpp smat.cpp scg.cpp -o main
+
+third_party/eigen-3.4.0:
+	@mkdir -p third_party
+	curl -L -s ${EIGEN_URL} | tar xz -C third_party
+
+third_party/json:
+	@mkdir -p third_party
+	curl -L -s ${JSON_URL} | tar xJ -C third_party
+
+sample.json: make_test.py
+	python3 $<
+
+clean:
+	@rm main
+
+distclean:
+	@rm -r ./third_party/*
+	@rmdir -v ./third_party

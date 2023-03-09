@@ -32,10 +32,10 @@ for k in range(nz):
             for d in range(3):
                 if k == 0:
                     bds.append([n,0.])
-                if k == nz-1 and j == ny-1 and d == 1:
-                    if i == 0 or i == nx-1:
-                        lds.append([n,1.])
-                    else:
+                if k == nz-2 and j == ny-2 and d == 1:
+                    if i == 1:  
+                        lds.append([n,-1.])
+                    elif i == nx-2:
                         lds.append([n,1.])
                 n=n+1
 

@@ -1,0 +1,20 @@
+diff --git a/main.cpp b/main.cpp
+index 2e1a2db..c3be4a0 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -1,4 +1,5 @@
+ #include "main.h"
++#include <chrono>
+ //
+ using std::chrono::high_resolution_clock;
+ using std::chrono::duration_cast;
+diff --git a/scg.cpp b/scg.cpp
+index 03498b3..c6a5fda 100644
+--- a/scg.cpp
++++ b/scg.cpp
+@@ -1,4 +1,5 @@
+ #include "main.h"
++#include <chrono>
+ //
+ using std::chrono::high_resolution_clock;
+ using std::chrono::duration_cast;
