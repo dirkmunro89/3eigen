@@ -1,1 +1,0 @@
-g++ -fopenmp -O2 -I /home/dirk/adv_fem/3igen/topopt/LBFGSB/ -I /home/dirk/adv_fem/eigen/eigen-3.4.0 lain.cpp -o lain

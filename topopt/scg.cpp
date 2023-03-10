@@ -183,7 +183,7 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
 //
 //  init sol and residual vectors
 //
-    x = VectorXd::Zero(n);
+    x = VectorXd::Zero(n); // can of course do init start here
     r = A*x+b;
     rho = VectorXd::Zero(n);
     for(i = 0; i<n; i++){
@@ -243,7 +243,7 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
 //
 //  main loop
 //
-    for(k=1;k<1000;k++){
+    for(k=1;k<1000000;k++){
 //
 //      M rho = r, M=C CT
 //      rho = CT C r

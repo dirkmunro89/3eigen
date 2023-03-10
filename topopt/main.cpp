@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 //
 //  construct subproblem
 //
-        double opt_vol = opt_ex.sum()/n_e/0.05 - 1.;
+        double opt_vol = opt_ex.sum()/n_e/0.025 - 1.;
 //
         std::cout << "===================================================" << "\n";
         std::cout << "Volume fraction " << opt_ex.sum()/n_e << endl;
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
         opt_ef(0) = opt_obj; 
         opt_ef(1) = opt_vol; 
         opt_df(0,Eigen::all) = opt_sns;
-        opt_df(1,Eigen::all) = VectorXd::Ones(n_e)/n_e/0.05;
+        opt_df(1,Eigen::all) = VectorXd::Ones(n_e)/n_e/0.025;
         opt_cf(0,Eigen::all) = -2.0*opt_sns.cwiseProduct(opt_ex.cwiseInverse());
         opt_cf(1,Eigen::all) = VectorXd::Zero(n_e);
         VectorXd opt_sxl = VectorXd::Zero(n_e);
