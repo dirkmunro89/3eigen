@@ -76,6 +76,6 @@ A simple topology optimization code, in this frame, is in work. See subdirectory
 </figure>
 
 <figure>
-<figcaption align = "center"> Dome-like; approaching thin walled, not yet converged (150 &times; 150 &times; 150)</figcaption>
-<img src="dome.png" alt="TopOpt2"/>
+<figcaption align = "center">  Stiffness design for twisting-like load (150 &times; 150 &times; 150); interpolated (to nodes) and clipped design variable field</figcaption>
+<img src="twist.png" alt="TopOpt2"/>
 </figure>
