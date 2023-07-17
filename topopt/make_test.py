@@ -4,9 +4,9 @@ import random
 
 out = {}
 
-ex = 150;
-ey = 150;
-ez = 150;
+ex = 10;
+ey = 10;
+ez = 10;
 e = ex*ey*ez
 gss = 2;
 mat = [1.0, .3, "plane_stress"]
@@ -37,9 +37,9 @@ for k in range(nz):
                     bds.append([n,0.])
                 if k == nz-2 and j == ny-2 and d == 1:
                     if i == 0:
-                        lds.append([n,-1.0])
+                        lds.append([n,0.0])
                     elif i == nx-1:
-                        lds.append([n,1.0])
+                        lds.append([n,0.0])
 #                   elif i == 1 or i == nx-2:
 #                       lds.append([n,0.5])
 #                   else:
@@ -59,9 +59,9 @@ for k in range (ez):
         for i in range(ex):
             els.append([n1,n2,n3,n4,n5,n6,n7,n8])
             if k < ez/2:
-                dex.append(0.025)
+                dex.append(1.0)
             else:
-                dex.append(0.025)
+                dex.append(1.0)
             n1=n1+1; n2=n2+1; n3=n3+1; n4=n4+1
             n5=n5+1; n6=n6+1; n7=n7+1; n8=n8+1
         n1=n1+1; n2=n2+1; n3=n3+1; n4=n4+1

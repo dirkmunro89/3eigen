@@ -109,7 +109,6 @@ int main(int argc, char *argv[])
     ffs_sol.setZero(n_f);
 //
 // mapping dof numbering vector with prescribed dofs removed
-// and the corresponding load vector
 //
     c=0;
     map_num.setZero(n_d);
@@ -118,7 +117,6 @@ int main(int argc, char *argv[])
             map_num(i) = -1;
         }else{
             map_num(i) = c;
-            ffs_lds(map_num(i)) = dfs_lds(i);
             c=c+1;
         }
     }
@@ -129,15 +127,25 @@ int main(int argc, char *argv[])
     double opt_obj;
     VectorXd opt_tmp2; 
     VectorXd opt_sns; 
-    for(int itr=0; itr<200; itr++){
+    for(int itr=0; itr<1; itr++){
 //
 //  filter the design variables
 //
-        opt_ro = opt_H*opt_ex;
+        opt_ro = opt_ex;
+//        opt_ro = opt_H*opt_ex;
+//
+//  free dof load vector
+//
+        for(i  = 0; i < n_d ; i++){
+            if(dfs_pre(i)){
+            }else{
+                ffs_lds(map_num(i)) = dfs_lds(i);
+            }
+        }
 //
 //  assemble with filtered density in the loop
 //
-        err=assy(n_e,n_f,nnz,els,nds,dfs_pre,map_num,opt_ro,ffs_K);
+        err=assy(n_e,n_f,nnz,els,nds,dfs_pre,map_num,opt_ro,ffs_K,ffs_lds);
 //
 //  solve
 //
@@ -174,7 +182,7 @@ int main(int argc, char *argv[])
 //
 //  construct subproblem
 //
-        double opt_vol = opt_ex.sum()/n_e/0.025 - 1.;
+        double opt_vol = opt_ex.sum()/n_e/1. - 1.;
 //
         std::cout << "===================================================" << "\n";
         std::cout << "Volume fraction " << opt_ex.sum()/n_e << endl;
@@ -184,7 +192,7 @@ int main(int argc, char *argv[])
         opt_ef(0) = opt_obj; 
         opt_ef(1) = opt_vol; 
         opt_df(0,Eigen::all) = opt_sns;
-        opt_df(1,Eigen::all) = VectorXd::Ones(n_e)/n_e/0.025;
+        opt_df(1,Eigen::all) = VectorXd::Ones(n_e)/n_e/1.;
         opt_cf(0,Eigen::all) = -2.0*opt_sns.cwiseProduct(opt_ex.cwiseInverse());
         opt_cf(1,Eigen::all) = VectorXd::Zero(n_e);
         VectorXd opt_sxl = VectorXd::Zero(n_e);

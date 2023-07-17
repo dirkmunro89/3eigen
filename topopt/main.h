@@ -30,6 +30,8 @@ int smat(MatrixXd& S, ArrayXd& jac);
 //
 int dmat(MatrixXd& c, MatrixXd& D, ArrayXd& jac);
 //
+int nmat(MatrixXd& c, MatrixXd& N, ArrayXd& jac);
+//
 //int scg_saad(int n, SpMat A, VectorXd& b, VectorXd& x);
 int scg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x);
 int scal (int n, SpMat& A, VectorXd& b, VectorXd& d);
@@ -42,10 +44,12 @@ int Mrhor(ArrayXd& C, int n, ArrayXi& ia, ArrayXi& iz, VectorXd& r, VectorXd& rh
 //
 int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H);
 //
-int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_pre, VectorXi& map_num, VectorXd& opt_ro, SpMat& ffs_K);
+int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_pre, VectorXi& map_num, VectorXd& opt_ro, SpMat& ffs_K, VectorXd& dfs_lds);
 //
 int solv(int sol, int n_f, SpMat ffs_K, VectorXd& ffs_lds, VectorXd& ffs_sol);
 //
 int sens(int n_d, MatrixXi& els, MatrixXd& nds, VectorXd& dfs_sol, VectorXd& opt_ro, VectorXd& opt_sns, double *opt_obj);
 //
 int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_l, VectorXd& dx_u, VectorXi& c_s, VectorXd& x_d, VectorXd& x);
+//
+int DiffShapFunc(double xi, double eta, double zeta, VectorXd& dNdxi, VectorXd& dNdeta, VectorXd& dNdzeta);

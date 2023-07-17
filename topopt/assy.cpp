@@ -6,11 +6,11 @@ using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
 //
-int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_pre, VectorXi& map_num, VectorXd& opt_ro, SpMat& ffs_K){
+int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_pre, VectorXi& map_num, VectorXd& opt_ro, SpMat& ffs_K, VectorXd& ffs_lds){
 //
     int e, i, i1, i2, j, j1, j2, k, c, err, gss, etp;
     int gind1, gind2, lind1, lind2;
-    ArrayXi con_e; MatrixXd nds_e; MatrixXd kay_e;
+    ArrayXi con_e; MatrixXd nds_e; MatrixXd kay_e; VectorXd eff_e;
     std::vector<T> coefs;
     coefs.reserve(nnz);
 //
@@ -22,10 +22,21 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
     int nnz_c = 0;
     int nnz_s = 0;
 //
+    VectorXd bf = VectorXd::Zero(24);
+    bf(2) = -1.;
+    bf(5) = -1.;
+    bf(8) = -1.;
+    bf(11) = -1.;
+    bf(14) = -1.;
+    bf(17) = -1.;
+    bf(20) = -1.;
+    bf(23) = -1.;
+//
 // element matrices (just init here, each is computed individually; keep this way, for unstructured)
 //
     MatrixXd D; //= MatrixXd::Zero(48,24); //!!
     MatrixXd S; //= MatrixXd::Zero(48, 48); //!!
+    MatrixXd N; //= MatrixXd::Zero(48, 48); //!!
     ArrayXd jac; //= ArrayXd::Zero(8); //!!
 //
 // loop over elements
@@ -34,6 +45,7 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
 //
         t11 = high_resolution_clock::now();
 //
+        N.setZero(24,24);
         D.setZero(48,24);
         S.setZero(48,48);
         jac.setZero(8);
@@ -42,11 +54,19 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
         con_e = els(e,Eigen::all);
         nds_e = nds(con_e,Eigen::all);
 //
+//      get N matrix
+        err=nmat(nds_e, N, jac);
+//
 //      get D matrix
         err=dmat(nds_e, D, jac);
 //
 //      get S matrix
         err=smat(S, jac);
+//
+        eff_e = N.transpose() * bf ;
+        if(e == 0){
+        std::cout << eff_e << "\n";
+        }
 //
 //      make element k matrix 
         kay_e = D.transpose() * S * D ;
@@ -63,6 +83,9 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
             for(j1 = 0; j1 < nds_e.cols(); j1++){
                 gind1 = nds_e.cols()*con_e[i1] + j1;
                 lind1 = i1*nds_e.cols() + j1;
+                if(dfs_pre(gind1) == 0 ){
+                    ffs_lds(map_num(gind1)) = ffs_lds(map_num(gind1)) + eff_e(lind1);
+                }
                 for(i2 = 0; i2 < con_e.size(); i2++){
                     for(j2 = 0; j2 < nds_e.cols(); j2++){
                         gind2 = nds_e.cols()*con_e[i2] + j2;

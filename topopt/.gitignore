@@ -1,2 +1,4 @@
 *.vtk
 *.json
+eigen-3.4.0
+json

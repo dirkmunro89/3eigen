@@ -1,7 +1,6 @@
 //
 #include "main.h"
 //
-int DiffShapFunc(double xi, double eta, double zeta, VectorXd& dNdxi, VectorXd& dNdeta, VectorXd& dNdzeta);
 int aux(MatrixXd& c, MatrixXd& B, ArrayXd& jac, int redInt);
 //
 int dmat(MatrixXd& c, MatrixXd& D, ArrayXd& jac)
