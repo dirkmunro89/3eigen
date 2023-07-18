@@ -18,8 +18,13 @@ int main(int argc, char *argv[])
     MatrixXd mat; string mat_aux;
     MatrixXd bds; MatrixXd lds;
 //  ArrayXi con_e; MatrixXd nds_e; MatrixXd kay_e;
-    VectorXd dfs_lds; VectorXi dfs_pre; VectorXd dfs_sol; 
-    VectorXd ffs_lds;                   VectorXd ffs_sol; 
+    VectorXd dfs_lds;
+    VectorXi dfs_pre; 
+    VectorXd dfs_sol; 
+//  VectorXd dfs_bfs;
+    VectorXd ffs_lds;                   
+//  VectorXd ffs_bfs;                   
+    VectorXd ffs_sol; 
     VectorXi map_num; 
 //  std::vector<T> coefs;
 //
@@ -38,18 +43,14 @@ int main(int argc, char *argv[])
 //
     auto t0 = high_resolution_clock::now();
 //
-    if (argc > 1) {
-        std::cout << "Input: " << argv[1] << " " << argv[2] << " " << argv[3] << endl;
+    if (argc > 4) {
+        std::cout << "Input: " << argv[1] << " " << argv[2] << " " << argv[3] << argv[4] << endl;
     }else{
-        std::cout << "Usage: " << argv[0] << " filename" << std::endl;
         return 1;
     }
-    int thr;
-    std::stringstream str1(argv[1]);
-    str1 >> thr;
-    int sol;
-    std::stringstream str2(argv[2]);
-    str2 >> sol;
+    int thr; std::stringstream str1(argv[1]); str1 >> thr;
+    int sol; std::stringstream str2(argv[2]); str2 >> sol;
+    int fdc; std::stringstream str3(argv[4]); str3 >> fdc;
 //
     Eigen::setNbThreads(thr);
 //
@@ -78,7 +79,6 @@ int main(int argc, char *argv[])
 //
 //  for opt
 //
-//  opt_ex = VectorXd::Ones(n_e);
     opt_ro = VectorXd::Zero(n_e);
     opt_ef = VectorXd::Zero(2);
     opt_df = MatrixXd::Zero(2,n_e);
@@ -100,12 +100,16 @@ int main(int argc, char *argv[])
 //  - (eventually) the solution vector
 //
     SpMat ffs_K(n_f,n_f);
-    dfs_lds.setZero(n_d); dfs_pre.setZero(n_d); dfs_sol.setZero(n_d);
+    dfs_lds.setZero(n_d); 
+    dfs_pre.setZero(n_d); 
+    dfs_sol.setZero(n_d);
+//  dfs_bfs.setZero(n_d);
     dfs_lds(lds.col(0)) = lds.col(1);
     dfs_pre(bds.col(0)) = Eigen::VectorXi::Ones(n_p); 
 //
 // Free DOF vectors for loads and solution vector
     ffs_lds.setZero(n_f); 
+//  ffs_bfs.setZero(n_f); 
     ffs_sol.setZero(n_f);
 //
 // mapping dof numbering vector with prescribed dofs removed
@@ -125,14 +129,21 @@ int main(int argc, char *argv[])
 //
     double opt_scl;
     double opt_obj;
-    VectorXd opt_tmp2; 
+    VectorXd opt_tmp; 
     VectorXd opt_sns; 
-    for(int itr=0; itr<1; itr++){
+//
+//  finite differences
+//
+    int fdi = 1;
+    if(fdc){
+        opt_ex = 0.5*VectorXd::Ones(n_e);
+    }
+//
+    for(int itr=0; itr<100; itr++){
 //
 //  filter the design variables
 //
-        opt_ro = opt_ex;
-//        opt_ro = opt_H*opt_ex;
+        opt_ro = opt_H*opt_ex;
 //
 //  free dof load vector
 //
@@ -157,8 +168,10 @@ int main(int argc, char *argv[])
         for(i  = 0; i < n_d ; i++){
             if(dfs_pre(i)){
                 dfs_sol(i)=0.;
+//              dfs_bfs(i)=0.;
             }else{
                 dfs_sol(i) = ffs_sol(c);
+//              dfs_bfs(i) = ffs_bfs(c);
                 c=c+1;
             }
         }
@@ -166,13 +179,13 @@ int main(int argc, char *argv[])
 //  compute compliance objective and sensitivities (similar to assembly)
 //
         opt_obj = 0.;
-        opt_tmp2 = VectorXd::Zero(n_e);
+        opt_tmp = VectorXd::Zero(n_e);
         opt_sns = VectorXd::Zero(n_e);
-        err=sens(n_d, els, nds, dfs_sol, opt_ro, opt_tmp2, &opt_obj);
+        err=sens(n_d,els,nds,dfs_sol,dfs_pre,opt_ro,opt_tmp,&opt_obj);
 //
 //  filter the sensitivities (need to check if transpose multiplication is fast...)
 //
-        opt_sns = opt_H.transpose()*opt_tmp2;
+        opt_sns = opt_H.transpose()*opt_tmp;
 //
         if(itr==0){
             opt_scl = opt_obj;
@@ -184,10 +197,14 @@ int main(int argc, char *argv[])
 //
         double opt_vol = opt_ex.sum()/n_e/1. - 1.;
 //
-        std::cout << "===================================================" << "\n";
-        std::cout << "Volume fraction " << opt_ex.sum()/n_e << endl;
-        std::cout << "Compliance " << opt_obj << endl;
-        std::cout << "===================================================" << "\n";
+        if(fdc){
+            std::cout << "Objective " << std::setprecision(15) << opt_obj << endl;
+        }else{
+            std::cout << "===================================================" << "\n";
+            std::cout << "Volume fraction " << opt_ex.sum()/n_e << endl;
+            std::cout << "Compliance " << opt_obj << endl;
+            std::cout << "===================================================" << "\n";
+        }
 //
         opt_ef(0) = opt_obj; 
         opt_ef(1) = opt_vol; 
@@ -202,14 +219,15 @@ int main(int argc, char *argv[])
         opt_sxl = opt_xl.cwiseMax(opt_ex - 0.1*(opt_xu-opt_xl));
         opt_sxu = opt_xu.cwiseMin(opt_ex + 0.1*(opt_xu-opt_xl));
 //
-//  solve subproblem
+//  solve subproblem and update design variables
 //
         VectorXd opt_nx = VectorXd::Zero(n_e);
-        err=dqpsub(opt_ex, opt_ef, opt_df, opt_cf, opt_sxl, opt_sxu, opt_cs, opt_la, opt_nx);
-//
-//  update design variables
-//
-        opt_ex = opt_nx;
+        if(fdc){
+            opt_ex(fdi) = opt_ex(fdi) + 1e-6;
+        }else{
+            err=dqpsub(opt_ex, opt_ef, opt_df, opt_cf, opt_sxl, opt_sxu, opt_cs, opt_la, opt_nx);
+            opt_ex = opt_nx;
+        }
 //
 //  write output
 //
@@ -218,9 +236,13 @@ int main(int argc, char *argv[])
         t2 = high_resolution_clock::now();
         auto dur_out = duration_cast<milliseconds>(t2 - t1).count();
         auto dur_tot = duration_cast<milliseconds>(t2 - t0).count();
-        std::cout << "Output written (" << dur_out << ")\n";
-        std::cout << "Total time (iteration) : " << dur_tot << "\n";
-        std::cout << "===================================================" << "\n";
+        if(fdc){
+
+        }else{
+            std::cout << "Output written (" << dur_out << ")\n";
+            std::cout << "Total time (iteration) : " << dur_tot << "\n";
+            std::cout << "===================================================" << "\n";
+        }
 //
 //  possibly terminate
 //

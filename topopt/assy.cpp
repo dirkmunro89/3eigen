@@ -64,9 +64,10 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
         err=smat(S, jac);
 //
         eff_e = N.transpose() * bf ;
-        if(e == 0){
-        std::cout << eff_e << "\n";
-        }
+        eff_e = eff_e*opt_ro(e);
+//        if(e == 0){
+//        std::cout << eff_e << "\n";
+//        }
 //
 //      make element k matrix 
         kay_e = D.transpose() * S * D ;
@@ -110,19 +111,19 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
 //
     auto t2 = high_resolution_clock::now();
     auto dur_asy = duration_cast<milliseconds>(t2 - t1).count();
-    std::cout << "K triplets made (" << dur_asy << ")\n";
-    std::cout << "- Element level matrix operations : " << dur_elm << "\n";
-    std::cout << "- Making triplets : " << dur_trp << "\n";
+//  std::cout << "K triplets made (" << dur_asy << ")\n";
+//  std::cout << "- Element level matrix operations : " << dur_elm << "\n";
+//  std::cout << "- Making triplets : " << dur_trp << "\n";
 //
     t1 = high_resolution_clock::now();
     ffs_K.setFromTriplets(coefs.begin(), coefs.end());
-    std::cout << "Estimated nnz : " << nnz << " / Actual nnz : " << nnz_c << endl;
+//  std::cout << "Estimated nnz : " << nnz << " / Actual nnz : " << nnz_c << endl;
     nnz_c = ffs_K.nonZeros();
     t2 = high_resolution_clock::now();
     auto dur_spr = duration_cast<milliseconds>(t2 - t1).count();
-    std::cout << "K made from triplets (" << dur_spr << ")\n";
-    std::cout << "Estimated nnz : " << nnz << " / Actual nnz : " << nnz_c << endl;
-    std::cout << "Filled : " << (double) nnz_c/n_f/n_f << endl;
+//  std::cout << "K made from triplets (" << dur_spr << ")\n";
+//  std::cout << "Estimated nnz : " << nnz << " / Actual nnz : " << nnz_c << endl;
+//  std::cout << "Filled : " << (double) nnz_c/n_f/n_f << endl;
 //
 return 0;
 }
