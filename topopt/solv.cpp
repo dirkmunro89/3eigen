@@ -22,7 +22,7 @@ int solv(int sol, int n_f, SpMat ffs_K, VectorXd& ffs_lds, VectorXd& ffs_sol){
         Eigen::ConjugateGradient<SpMat,
             Eigen::Lower|Eigen::Upper,Eigen::DiagonalPreconditioner<double>> solver;
         solver.setMaxIterations(1000000);
-        solver.setTolerance(1e-6);
+        solver.setTolerance(1e-12);
         solver.compute(ffs_K);
         ffs_sol = solver.solve(ffs_lds);
 //      std::cout << "- #iterations:     " << solver.iterations() << std::endl;

@@ -179,7 +179,7 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
         c=c+1;
     }
 //
-    std::cout << "Check sym nnz: " << cc << " " << nnz/2 + n/2 << endl;
+//  std::cout << "Check sym nnz: " << cc << " " << nnz/2 + n/2 << endl;
 //
 //  init sol and residual vectors
 //
@@ -201,14 +201,14 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
     auto t1 = high_resolution_clock::now();
     c= 0;
     double alpa = 0.;
-    std::cout << "alpha = "<< alpa << endl;
+//  std::cout << "alpha = "<< alpa << endl;
     err=precon(nnz,n,C,ia,iz,alpa);
     while(err == 0){
         if(alpa<=0.){ 
             alpa = 0.005;
         }
         alpa=alpa+alpa;
-        std::cout << err << " alpha = "<< alpa << endl;
+//      std::cout << err << " alpha = "<< alpa << endl;
         err=precon(nnz,n,C,ia,iz,alpa);
         c=c+1;
         if(c==1000){
@@ -217,7 +217,7 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
     }
     auto t2 = high_resolution_clock::now();
     auto dur_chl = duration_cast<milliseconds>(t2 - t1).count();
-    std::cout << "Preconditioned (" << dur_chl << ")\n";
+//  std::cout << "Preconditioned (" << dur_chl << ")\n";
 //
 //
 //  try making sparse rep...
@@ -275,10 +275,10 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
         rrho1=rrho;
 //
     }
-    std::cout << "iteration = " << k << " error = " << ram << " limit = "<< c1*qam << endl;
+//  std::cout << "iteration = " << k << " error = " << ram << " limit = "<< c1*qam << endl;
     t2 = high_resolution_clock::now();
     auto dur_itr = duration_cast<milliseconds>(t2 - t1).count();
-    std::cout << " ("<< dur_itr << ")" << endl;
+//  std::cout << " ("<< dur_itr << ")" << endl;
 //
 //  back-scale solution vector and load vector
 //
@@ -351,7 +351,7 @@ int scg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x)
 //
     }
 //
-    std::cout << "iteration = " << k << " error = " << ram << " limit = "<< c1*qam << endl;
+//  std::cout << "iteration = " << k << " error = " << ram << " limit = "<< c1*qam << endl;
 //
 //  back-scale solution vector
 //

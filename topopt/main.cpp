@@ -17,23 +17,22 @@ int main(int argc, char *argv[])
     MatrixXd nds; MatrixXi els; 
     MatrixXd mat; string mat_aux;
     MatrixXd bds; MatrixXd lds;
-//  ArrayXi con_e; MatrixXd nds_e; MatrixXd kay_e;
     VectorXd dfs_lds;
     VectorXi dfs_pre; 
     VectorXd dfs_sol; 
-//  VectorXd dfs_bfs;
     VectorXd ffs_lds;                   
-//  VectorXd ffs_bfs;                   
     VectorXd ffs_sol; 
     VectorXi map_num; 
-//  std::vector<T> coefs;
 //
 //  for opt
 //
     VectorXd opt_ex;
+    VectorXd opt_exh;
     VectorXd opt_la;
     VectorXd opt_ro;
     VectorXd opt_ef;
+    VectorXd opt_efh;
+    VectorXd opt_ef0;
     MatrixXd opt_df;
     MatrixXd opt_cf;
     VectorXd opt_xl;
@@ -43,14 +42,17 @@ int main(int argc, char *argv[])
 //
     auto t0 = high_resolution_clock::now();
 //
-    if (argc > 4) {
-        std::cout << "Input: " << argv[1] << " " << argv[2] << " " << argv[3] << argv[4] << endl;
+    if (argc > 5) {
+        std::cout<<"Input: "<<argv[1]<<" "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<" "<<argv[5]<<endl;
     }else{
+        std::cout<<"Input: "<<"thr"<<" "<<"sol"<<" "<<"input.json"<<" "<<"fdc"<<"vol"<<endl;
         return 1;
     }
     int thr; std::stringstream str1(argv[1]); str1 >> thr;
     int sol; std::stringstream str2(argv[2]); str2 >> sol;
     int fdc; std::stringstream str3(argv[4]); str3 >> fdc;
+    double vol; std::stringstream str4(argv[5]); str4 >> vol;
+    double opt_vf=vol;
 //
     Eigen::setNbThreads(thr);
 //
@@ -66,7 +68,6 @@ int main(int argc, char *argv[])
 //  ... and define some other things ...
 //
     nnz = pow(els.cols()*nds.cols(),2)*els.rows();
-//  coefs.reserve(nnz);
     n_e = els.rows(); // number of elements
     n_n = nds.rows(); // number of nodes
     n_d = nds.cols()*nds.rows(); // number of dofs
@@ -81,9 +82,11 @@ int main(int argc, char *argv[])
 //
     opt_ro = VectorXd::Zero(n_e);
     opt_ef = VectorXd::Zero(2);
+    opt_efh = VectorXd::Zero(2);
+    opt_ef0 = VectorXd::Zero(2);
     opt_df = MatrixXd::Zero(2,n_e);
     opt_cf = MatrixXd::Zero(2, n_e);
-    opt_xl = VectorXd::Ones(n_e)*1e-3;
+    opt_xl = VectorXd::Zero(n_e);
     opt_xu = VectorXd::Ones(n_e);
     opt_mv = VectorXd::Ones(n_e)*0.1;
     opt_cs = VectorXi::Ones(1);
@@ -103,13 +106,11 @@ int main(int argc, char *argv[])
     dfs_lds.setZero(n_d); 
     dfs_pre.setZero(n_d); 
     dfs_sol.setZero(n_d);
-//  dfs_bfs.setZero(n_d);
     dfs_lds(lds.col(0)) = lds.col(1);
     dfs_pre(bds.col(0)) = Eigen::VectorXi::Ones(n_p); 
 //
 // Free DOF vectors for loads and solution vector
     ffs_lds.setZero(n_f); 
-//  ffs_bfs.setZero(n_f); 
     ffs_sol.setZero(n_f);
 //
 // mapping dof numbering vector with prescribed dofs removed
@@ -130,16 +131,23 @@ int main(int argc, char *argv[])
     double opt_scl;
     double opt_obj;
     VectorXd opt_tmp; 
-    VectorXd opt_sns; 
+    VectorXd opt_sns1; 
+    VectorXd opt_sns2; 
 //
-//  finite differences
+//  if finite differences
 //
-    int fdi = 1;
+    double fdx = 0;
+    int fdi = (int) (n_e / 2);
     if(fdc){
         opt_ex = 0.5*VectorXd::Ones(n_e);
     }
 //
-    for(int itr=0; itr<100; itr++){
+    printf("=================================================================\n");
+    printf("  k         f0         f1      dx      df      bw      tk      tt\n");
+//
+    for(int itr=0; itr<400; itr++){
+//
+        auto ti = high_resolution_clock::now();
 //
 //  filter the design variables
 //
@@ -168,10 +176,8 @@ int main(int argc, char *argv[])
         for(i  = 0; i < n_d ; i++){
             if(dfs_pre(i)){
                 dfs_sol(i)=0.;
-//              dfs_bfs(i)=0.;
             }else{
                 dfs_sol(i) = ffs_sol(c);
-//              dfs_bfs(i) = ffs_bfs(c);
                 c=c+1;
             }
         }
@@ -180,53 +186,93 @@ int main(int argc, char *argv[])
 //
         opt_obj = 0.;
         opt_tmp = VectorXd::Zero(n_e);
-        opt_sns = VectorXd::Zero(n_e);
+        opt_sns1 = VectorXd::Zero(n_e);
         err=sens(n_d,els,nds,dfs_sol,dfs_pre,opt_ro,opt_tmp,&opt_obj);
 //
 //  filter the sensitivities (need to check if transpose multiplication is fast...)
 //
-        opt_sns = opt_H.transpose()*opt_tmp;
+        opt_sns1 = opt_H.transpose()*opt_tmp;
+        opt_tmp = -VectorXd::Ones(n_e)/n_e/opt_vf;
+        opt_sns2 = opt_H.transpose()*opt_tmp;
+//
+//  scaling objective
 //
         if(itr==0){
             opt_scl = opt_obj;
         }
         opt_obj=opt_obj/opt_scl;
-        opt_sns=opt_sns/opt_scl;
+        opt_sns1=opt_sns1/opt_scl;
 //
 //  construct subproblem
 //
-        double opt_vol = opt_ex.sum()/n_e/1. - 1.;
-//
-        if(fdc){
-            std::cout << "Objective " << std::setprecision(15) << opt_obj << endl;
-        }else{
-            std::cout << "===================================================" << "\n";
-            std::cout << "Volume fraction " << opt_ex.sum()/n_e << endl;
-            std::cout << "Compliance " << opt_obj << endl;
-            std::cout << "===================================================" << "\n";
-        }
-//
-        opt_ef(0) = opt_obj; 
-        opt_ef(1) = opt_vol; 
-        opt_df(0,Eigen::all) = opt_sns;
-        opt_df(1,Eigen::all) = VectorXd::Ones(n_e)/n_e/1.;
-        opt_cf(0,Eigen::all) = -2.0*opt_sns.cwiseProduct(opt_ex.cwiseInverse());
-        opt_cf(1,Eigen::all) = VectorXd::Zero(n_e);
+//      opt_la = VectorXd::Zero(1);
         VectorXd opt_sxl = VectorXd::Zero(n_e);
         VectorXd opt_sxu = VectorXd::Zero(n_e);
-        opt_cs = VectorXi::Ones(1);
-//      opt_la = VectorXd::Zero(1);
         opt_sxl = opt_xl.cwiseMax(opt_ex - 0.1*(opt_xu-opt_xl));
         opt_sxu = opt_xu.cwiseMin(opt_ex + 0.1*(opt_xu-opt_xl));
+        opt_cs = VectorXi::Ones(1);
+
+        double opt_df0 = 1.0;
+        if(itr>0){
+            opt_df0 = fabs((opt_ef(0) - opt_efh(0))/opt_ef(0));
+        }
+        opt_efh = opt_ef;
+        opt_ef(0) = opt_obj;
+        opt_ef(1) = -opt_ro.sum()/n_e/opt_vf + 1.;
+//
+        if(fdc){
+            if(itr == 0){
+                opt_ef0=opt_ef;
+                opt_df(0,Eigen::all) = opt_sns1;
+                opt_df(1,Eigen::all) = opt_sns2;
+            }else{
+                VectorXd opt_err = VectorXd::Zero(2);
+                printf("%8.1e ", fdx);
+                for(int j = 0; j<2; j++){
+                    opt_err(j) = ((opt_ef(j)-opt_ef0(j))/fdx - opt_df(j,fdi))/opt_df(j,fdi);
+                    printf("%14.7e ", opt_err(j));
+                }
+                printf("\n");
+            }
+        }else{
+//
+            opt_df(0,Eigen::all) = opt_sns1;
+            opt_df(1,Eigen::all) = opt_sns2;
+            opt_cf(0,Eigen::all) = 1e-6*VectorXd::Ones(n_e);
+            if(itr>0){
+                double nrm = (opt_ex-opt_exh).squaredNorm();
+                double tmp = 2.0*(opt_efh(0)-opt_ef(0)-opt_df(0,Eigen::all).dot(opt_exh-opt_ex))/nrm;
+                cout << tmp << endl;
+                opt_cf(0,Eigen::all) = (tmp*VectorXd::Ones(n_e)).cwiseMax(1e-6);
+            }
+//          opt_cf(0,Eigen::all) = -2.0*opt_sns.cwiseProduct(opt_ex.cwiseInverse());
+            opt_cf(1,Eigen::all) = VectorXd::Zero(n_e);
+//
+        }
 //
 //  solve subproblem and update design variables
 //
+        opt_exh=opt_ex;
+//
+        double opt_dx = 0.;
         VectorXd opt_nx = VectorXd::Zero(n_e);
         if(fdc){
-            opt_ex(fdi) = opt_ex(fdi) + 1e-6;
+            fdx = 1e-16*pow(10.0,itr);
+            opt_ex = 0.5*VectorXd::Ones(n_e);
+            opt_ex(fdi) = opt_ex(fdi) + fdx;
         }else{
             err=dqpsub(opt_ex, opt_ef, opt_df, opt_cf, opt_sxl, opt_sxu, opt_cs, opt_la, opt_nx);
+            opt_dx = (opt_nx - opt_ex).array().abs().maxCoeff();
             opt_ex = opt_nx;
+        }
+//
+        double opt_baw = 0.0;
+        for(int j = 0; j<n_e;j++){
+            if( opt_ex(j) < opt_xl(j) + 1e-3 ){
+                opt_baw = opt_baw + 1.0/n_e;
+            }else if ( opt_ex(j) > opt_xu(j) - 1e-3) {
+                opt_baw = opt_baw + 1.0/n_e;
+            }
         }
 //
 //  write output
@@ -235,18 +281,24 @@ int main(int argc, char *argv[])
         wrte_lvtk(argv[3],itr, nds, els, gss, mat, mat_aux, dfs_sol, dfs_pre, dfs_lds, opt_ex, opt_ro);
         t2 = high_resolution_clock::now();
         auto dur_out = duration_cast<milliseconds>(t2 - t1).count();
+        auto dur_itr = duration_cast<milliseconds>(t2 - ti).count();
         auto dur_tot = duration_cast<milliseconds>(t2 - t0).count();
         if(fdc){
-
+            if(itr==18){
+                break;
+            }
         }else{
-            std::cout << "Output written (" << dur_out << ")\n";
-            std::cout << "Total time (iteration) : " << dur_tot << "\n";
-            std::cout << "===================================================" << "\n";
+            printf("%3d %10.3e %10.3e %4.1e %4.1e %4.1e %4.1e %4.1e\n", itr, opt_ef(0)*opt_scl, 
+                opt_ef(1), opt_dx, opt_df0, opt_baw, (double)dur_itr/1000, (double)dur_tot/1000.);
         }
+//
+        fflush(stdout);
 //
 //  possibly terminate
 //
-
+        if(fdc==0 && opt_dx < 1e-2 && opt_df0 < 1e-4){
+            break;
+        }
 //
     }
 //

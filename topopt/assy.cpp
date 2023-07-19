@@ -19,6 +19,9 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
     auto t22 = high_resolution_clock::now();
     double dur_elm = 0; double dur_trp = 0;
 //
+    double Emin = 1e-9;
+    double Emax = 1e0;
+//
     int nnz_c = 0;
     int nnz_s = 0;
 //
@@ -71,7 +74,7 @@ int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_
 //
 //      make element k matrix 
         kay_e = D.transpose() * S * D ;
-        kay_e = kay_e*pow(opt_ro(e),3.);
+        kay_e = kay_e*(Emin + pow(opt_ro(e),3.)*(Emax-Emin));
 //
         t22 = high_resolution_clock::now();
         duration<double, std::milli> dur_tmp1 = t22 - t11;

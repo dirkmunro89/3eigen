@@ -17,6 +17,9 @@ int sens(int n_d, MatrixXi& els, MatrixXd& nds, VectorXd& dfs_sol, VectorXi& dfs
     auto t22 = high_resolution_clock::now();
     double dur_elm = 0; double dur_trp = 0;
 //
+    double Emin = 1e-9;
+    double Emax = 1e0;
+//
 // element matrices (just init here, each is computed individually; keep this way, for unstructured)
 //
     VectorXd bf = VectorXd::Zero(24);
@@ -82,10 +85,10 @@ int sens(int n_d, MatrixXi& els, MatrixXd& nds, VectorXd& dfs_sol, VectorXi& dfs
                     for(j2 = 0; j2 < nds_e.cols(); j2++){
                         gind2 = nds_e.cols()*con_e[i2] + j2;
                         lind2 = i2*nds_e.cols() + j2;
-                        *opt_obj= *opt_obj + 
+                        *opt_obj= *opt_obj + Emin + (Emax-Emin)*
                             pow(opt_ro(e),3.)*kay_e(lind1,lind2)*dfs_sol(gind1)*dfs_sol(gind2);
                         opt_sns(e) = opt_sns(e) 
-                            - 3.*pow(opt_ro(e),2.)*kay_e(lind1,lind2)*dfs_sol(gind1)*dfs_sol(gind2);
+                 - 3.*pow(opt_ro(e),2.)*(Emax-Emin)*kay_e(lind1,lind2)*dfs_sol(gind1)*dfs_sol(gind2);
                     }
                 }
             }

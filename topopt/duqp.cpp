@@ -87,9 +87,9 @@ int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_
 //    VectorXd x_d = VectorXd::Ones(c_s.size())*0e0;
     int niter = solver.minimize(fun, x_d, fx, lb, ub);
 //
-    std::cout << niter << " iterations" << std::endl;
-    std::cout << "x_d = \n" << x_d.transpose() << std::endl;
-    std::cout << "===================================================" << "\n";
+//    std::cout << niter << " iterations" << std::endl;
+//    std::cout << "x_d = \n" << x_d.transpose() << std::endl;
+//    std::cout << "===================================================" << "\n";
 //    std::cout << "f(x) = " << fx << std::endl;
 //
 //  update primal variables
