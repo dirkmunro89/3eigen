@@ -54,10 +54,10 @@ int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_
 {
     // set up parameters
     LBFGSBParam<double> param;
-    param.epsilon = 1e-12;
-    param.ftol = 1e-12;
+//  param.epsilon = 1e-12;
+//  param.ftol = 1e-12;
     param.max_linesearch = 1000000;
-    param.m = 20;
+//  param.m = 20;
 //
     // create solver and function object
     LBFGSBSolver<double> solver(param);  
