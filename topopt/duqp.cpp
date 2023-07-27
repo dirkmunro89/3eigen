@@ -52,22 +52,15 @@ public:
 
 int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_l, VectorXd& dx_u, VectorXi& c_s, VectorXd& x_d, VectorXd& x)
 {
-    // Set up parameters
-    LBFGSBParam<double> param;  // New parameter class
+    // set up parameters
+    LBFGSBParam<double> param;
     param.epsilon = 1e-12;
     param.ftol = 1e-12;
     param.max_linesearch = 1000000;
     param.m = 20;
 //
-    // Create solver and function object
-    LBFGSBSolver<double> solver(param);  // New solver class
-//
-//    VectorXd x_k = VectorXd::Ones(3);
-//    VectorXd g = VectorXd::Ones(n+1);
-//    MatrixXd dg = MatrixXd::Ones(n+1,3);
-//    VectorXd dx_l = VectorXd::Ones(3);
-//    VectorXd dx_u = VectorXd::Ones(3);
-//    MatrixXd dc = MatrixXd::Ones(n+1,3);
+    // create solver and function object
+    LBFGSBSolver<double> solver(param);  
     Dual fun(x_k, g, dg, dx_l, dx_u, dc);
 //
     // dual variable bounds
@@ -81,22 +74,18 @@ int dqpsub(VectorXd& x_k, VectorXd& g, MatrixXd& dg, MatrixXd& dc, VectorXd& dx_
     }
 //
     double fx;
-//    VectorXd x_d = VectorXd::Ones(c_s.size())*0e0;
     int niter = solver.minimize(fun, x_d, fx, lb, ub);
 //
-//    std::cout << niter << " iterations" << std::endl;
-//    std::cout << "x_d = \n" << x_d.transpose() << std::endl;
-//    std::cout << "===================================================" << "\n";
-//    std::cout << "f(x) = " << fx << std::endl;
+//  std::cout << niter << " iterations" << std::endl;
+//  std::cout << "x_d = \n" << x_d.transpose() << std::endl;
+//  std::cout << "===================================================" << "\n";
+//  std::cout << "f(x) = " << fx << std::endl;
 //
 //  update primal variables
-//
-    VectorXd tmp1;
-    VectorXd tmp2;
+    VectorXd tmp1; VectorXd tmp2;
     tmp1 = (dc(0,all) + x_d.transpose()*dc(seq(1,last),all));
     tmp2 = dg(0,all) + x_d.transpose()*dg(seq(1,last),all);
     x = ((x_k - tmp2.cwiseProduct(tmp1.cwiseInverse())).cwiseMax(dx_l)).cwiseMin(dx_u);
-//  std::cout << "x = \n" << x.transpose() << std::endl;
 //
     return 0;
 }
