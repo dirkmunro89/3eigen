@@ -34,7 +34,7 @@ int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H)
     for(int e = 0; e < n_e; e++){
 //
         con_e = els(e,Eigen::all); // nodes of element
-        for(int l = 0; l < lvl; l++){ //!!!! would need modification for largest radii; ideally recursive
+        for(int l = 0; l < lvl; l++){ //!!!! would need mod for larger radii; ideally recursive
                                       // function
             noc_e = noc(con_e,Eigen::all); // elements connected to each node
             std::set<int> q{noc_e.data(), noc_e.data() + noc_e.size()  }; // get unique element ids
