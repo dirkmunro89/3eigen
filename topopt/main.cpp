@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
 //
 // check input
 //
-    if (argc > 5) {
-        std::cout<<"Input: "<<argv[1]<<" "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<" "<<argv[5]<<" "<<argv[6]<<endl;
+    if (argc > 6) {
+        std::cout<<"Input: "<<argv[1]<<" "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<" "<<argv[5]<<" "<<argv[6]<<" "<<argv[7]<<endl;
     }else{
-        std::cout<<"Input: "<<"thr"<<" "<<"sol"<<" "<<"input.json"<<" "<<"fdc"<<"vol"<<"nca"<<endl;
+        std::cout<<"Input: "<<"thr "<<"sol "<<"input.json "<<"fdc "<<"vol "<<"nca "<<"lvl "<<endl;
         return 1;
     }
     int thr; std::stringstream str1(argv[1]); str1 >> thr;
@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
     double vol; std::stringstream str4(argv[5]); str4 >> vol;
     double opt_vf=vol;
     int nca; std::stringstream str5(argv[6]); str5 >> nca;
+    int lvl; std::stringstream str6(argv[7]); str6 >> lvl;
 //
 // set threads
 //
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
     flt._ro = VectorXd::Zero(n_e);
     flt._H = SpMat(n_e,n_e);
 //  SpMat opt_H(n_e,n_e);
-    err=filt_init(n_e, els, nds, flt._H);
+    err=filt_init(n_e, els, nds, flt._H, lvl);
 //
 // dof vectors containing 
 //  - loads
@@ -315,7 +316,7 @@ int main(int argc, char *argv[])
                 double tmp; double nrm;
                 opt._df(0,Eigen::all) = opt_sns1;
                 opt._df(1,Eigen::all) = opt_sns2;
-                opt._cf(0,Eigen::all) = 1e-6*VectorXd::Ones(n_e);
+                opt._cf(0,Eigen::all) = 1e-9*VectorXd::Ones(n_e);
                 if(itr>0){
                     nrm = (opt._ex-opt._exh).squaredNorm();
 		    if(nca){
@@ -323,7 +324,7 @@ int main(int argc, char *argv[])
 		    }else{
                     	tmp=2.*(opt._efh(0)-opt._ef(0)-opt._df(0,Eigen::all).dot(opt._exh-opt._ex))/nrm;
 	            }
-                    opt._cf(0,Eigen::all) = (tmp*VectorXd::Ones(n_e)).cwiseMax(1e-6);
+                    opt._cf(0,Eigen::all) = (tmp*VectorXd::Ones(n_e)).cwiseMax(1e-9);
 //                  opt._cf(0,Eigen::all) = -2.0*opt_sns.cwiseProduct(opt._ex.cwiseInverse());
                 }
                 opt._cf(1,Eigen::all) = VectorXd::Zero(n_e);
