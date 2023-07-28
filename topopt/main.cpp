@@ -313,10 +313,11 @@ int main(int argc, char *argv[])
 //
 //              spherical curvature
 //
+  		double eps = 1e-6;
                 double tmp; double nrm;
                 opt._df(0,Eigen::all) = opt_sns1;
                 opt._df(1,Eigen::all) = opt_sns2;
-                opt._cf(0,Eigen::all) = 1e-9*VectorXd::Ones(n_e);
+                opt._cf(0,Eigen::all) = eps*VectorXd::Ones(n_e);
                 if(itr>0){
                     nrm = (opt._ex-opt._exh).squaredNorm();
 		    if(nca){
@@ -324,7 +325,7 @@ int main(int argc, char *argv[])
 		    }else{
                     	tmp=2.*(opt._efh(0)-opt._ef(0)-opt._df(0,Eigen::all).dot(opt._exh-opt._ex))/nrm;
 	            }
-                    opt._cf(0,Eigen::all) = (tmp*VectorXd::Ones(n_e)).cwiseMax(1e-9);
+                    opt._cf(0,Eigen::all) = (tmp*VectorXd::Ones(n_e)).cwiseMax(eps);
 //                  opt._cf(0,Eigen::all) = -2.0*opt_sns.cwiseProduct(opt._ex.cwiseInverse());
                 }
                 opt._cf(1,Eigen::all) = VectorXd::Zero(n_e);
