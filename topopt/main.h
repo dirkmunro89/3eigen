@@ -50,7 +50,7 @@ int pcg_hond(int n, SpMat& A, VectorXd& b, VectorXd& x);
 //
 int Mrhor(ArrayXd& C, int n, ArrayXi& ia, ArrayXi& iz, VectorXd& r, VectorXd& rho);
 //
-int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H, int lvl);
+int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H, int lvl, int nze);
 //
 int assy(int n_e, int n_f, int nnz, MatrixXi& els, MatrixXd& nds, VectorXi& dfs_pre, VectorXi& map_num, VectorXd& opt_ro, SpMat& ffs_K, VectorXd& dfs_lds);
 //

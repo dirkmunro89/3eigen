@@ -28,4 +28,6 @@ struct { // for last acceptable subproblem data
 struct { // for density filtering data
     VectorXd _ro;
     SpMat _H;
+    int _lvl;
+    int _nze;
 } flt;
