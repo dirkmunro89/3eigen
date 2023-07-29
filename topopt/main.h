@@ -14,6 +14,13 @@ using Eigen::VectorXi;
 using Eigen::VectorXd;
 using Eigen::ArrayXd;
 using Eigen::seq;
+using Eigen::all;
+//
+#include <chrono>
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 //
 //json stuff from https://json.nlohmann.me/integration/  
 // and/or https://github.com/nlohmann/json/releases

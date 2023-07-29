@@ -4,14 +4,27 @@
 int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H, int lvl)
 {
 //
-    std::vector<T> coefs;
-//  coefs.reserve(200*n_e); // 27
-    ArrayXi con_e;
-    MatrixXi noc_e;
+  std::vector<T> coefs;
+  if(lvl == 0){
+    cout<<"No filtering"<<endl;
+    coefs.reserve(n_e);
+  }else if(lvl==1){
+    cout<<"Level 1 filtering; reserving 28 entries per element."<<endl;
+    coefs.reserve(28*n_e);
+  }else if(lvl==2){
+    cout<<"Level 2 filtering; reserving 153 entries per element."<<endl;
+    coefs.reserve(153*n_e);
+  }else if(lvl==3){
+    cout<<"Level 3 filtering; reserving 496 entries per element."<<endl;
+    coefs.reserve(496*n_e);
+  }else{
+    cout<<"Filtering level unknown; not reserving entries."<<endl;
+  }
+  ArrayXi con_e;
+  MatrixXi noc_e;
 //
-//  int lvl;
-//
-    cout << lvl << endl;
+//  lvl = 0 -> nothing
+//  lvl = 1 -> filter immediate neighbours
 //
 //  lvl=2;
 //
@@ -46,53 +59,57 @@ int filt_init(int n_e, MatrixXi& els, MatrixXd& nds, SpMat& H, int lvl)
 //
 // for each element
 //
+    double krn;
+    double sum=0.;
     for(int e = 0; e < n_e; e++){
 //
-//     get nodes connected to element e
-        con_e = els(e,Eigen::all); 
-//     elements connected to each node (immediate neighbours)
-        noc_e = noc(con_e,Eigen::all); 
-//     make set of unique entries
-        std::set<int> q0{noc_e.data(), noc_e.data() + noc_e.size()  }; 
-//     erase -1 place-holder
-        q0.erase(-1); 
+      double sum_e=0.;
+      std::set<int> q0; 
+      q0.insert(e);
+      krn = (float) lvl+1.0;
+      coefs.push_back(T(e, e, krn));
+      sum_e=sum_e+krn;
 //
 //     for each level
         for(int l = 0; l < lvl; l++){ 
 //       make an empty set for entries in this level
-            std::set<int> qn;
-//       loop over entries in q0, add entries to qn
-            for(auto it = q0.begin(); it!=q0.end();it++) 
-            {
-                    con_e = els(*it,Eigen::all); 
-                    noc_e = noc(con_e,Eigen::all); 
-                    std::set<int> tmp{noc_e.data(), noc_e.data() + noc_e.size()  }; 
-                    qn.insert(tmp.begin(),tmp.end());
-            }
-//        erase -1 placeholder
-            qn.erase(-1); 
-//        add to q0
-            q0.insert(qn.begin(),qn.end());
+          std::set<int> qn;
+//       loop over entries in q0, add neighbours to qn
+          for(auto it = q0.begin(); it!=q0.end();it++) 
+          {
+             con_e = els(*it,Eigen::all); 
+             noc_e = noc(con_e,Eigen::all); 
+             std::set<int> tmp{noc_e.data(), noc_e.data() + noc_e.size()  }; 
+             qn.insert(tmp.begin(),tmp.end());
+          }
+//       erase -1 placeholder
+          qn.erase(-1); 
+//       erase what was in q0
+          for(auto it = q0.begin(); it!=q0.end();it++)
+          {
+            qn.erase(*it);
+          }
+//       make filter coefs
+          for(auto it = qn.begin(); it!=qn.end();it++)
+          {
+            krn = (float)lvl - l;
+            coefs.push_back(T(e, *it, krn));
+            sum_e=sum_e+krn;
+          }
+//       add everything to q0 for next lelvel
+          q0.insert(qn.begin(),qn.end());
         }
-//
-//     make filter coefs
-        double krn;
-        for(auto it = q0.begin(); it!=q0.end();it++)
-        {
-            krn = lvl*len*1.01 - (cen(e,Eigen::all)-cen(*it,Eigen::all)).norm();
-            if(krn > 0.){
-                coefs.push_back(T(e, *it, krn));
-                Hsum(e) = Hsum(e) + krn;
-            }
-        }
-//
+      sum=fmax(sum_e,sum);
     }
 //
+    cout <<"Max. number of non-zeros associated with an element: "<<sum << endl;
+//
+    for(int e = 0; e < n_e; e++){
+        Hsum(e)=sum;
+    }
     H.setFromTriplets(coefs.begin(), coefs.end());
     H = H * Hsum.asDiagonal().inverse();
-    cout << H.nonZeros() << endl;
-//  H.conservativeResize(n_e,n_e);
-//  cout << H.nonZeros() << endl;
+    cout <<"Number of non-zeros in filter matrix: "<<H.nonZeros() << endl;
 //
 return 0;
 }
